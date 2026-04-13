@@ -100,11 +100,12 @@ $phong_info = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM phong WHERE 
                 <h6 class="small text-uppercase opacity-75">Hóa đơn tháng này</h6>
                 <?php 
             // Truy vấn hóa đơn theo ma_phong thay vì ma_sv
-$sql_hd = "SELECT * FROM hoa_don WHERE ma_phong = '$ma_phong' ORDER BY nam DESC, thang DESC LIMIT 1";
+                $sql_hd = "SELECT * FROM hoa_don WHERE ma_phong = '$ma_phong' ORDER BY nam DESC, thang DESC LIMIT 1";
                 $res_hd = mysqli_query($conn, $sql_hd);
                 $hd = mysqli_fetch_assoc($res_hd);
                 ?>
                 <h2 class="fw-bold mb-1"><?= number_format($hd['tong_tien'] ?? 0) ?> VNĐ</h2>
+                <p class="small mb-0">"Hóa đơn tính chung cho cả phòng. Vui lòng thống nhất với các thành viên để thực hiện thanh toán."</p>
                 <p class="small mb-3">Tình trạng: <b><?= $hd['trang_thai'] ?? 'N/A' ?></b></p>
                 <a href="hoa_don_chi_tiet.php" class="btn btn-light btn-sm w-100 fw-bold">Xem chi tiết & Thanh toán</a>
             </div>

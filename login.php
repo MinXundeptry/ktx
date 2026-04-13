@@ -1,5 +1,5 @@
 <?php
-include 'connect.php'; // Nhớ kiểm tra đúng tên file kết nối của ông
+include 'connect.php'; 
 session_start();
 
 // Nếu đã đăng nhập rồi thì cho vào index luôn
@@ -12,27 +12,47 @@ $error = "";
 
 if (isset($_POST['login'])) {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
-    $password = $_POST['password']; // Ở đây tôi để pass thô, nếu ông dùng password_hash thì cần verify nhé
+    $password = $_POST['password']; 
 
     if (empty($username) || empty($password)) {
         $error = "Vui lòng nhập đầy đủ thông tin!";
     } else {
-        // Truy vấn kiểm tra tài khoản và vai trò từ bảng tai_khoan
-        $sql = "SELECT * FROM tai_khoan WHERE ten_dang_nhap = '$username' AND mat_khau = '$password'";
+        // 1. Truy vấn thông tin tài khoản
+        $sql = "SELECT * FROM tai_khoan WHERE ten_dang_nhap = '$username'";
         $result = mysqli_query($conn, $sql);
 
         if (mysqli_num_rows($result) == 1) {
             $user = mysqli_fetch_assoc($result);
             
-            // Lưu thông tin vào Session
-            $_SESSION['ten_dang_nhap'] = $user['ten_dang_nhap'];
-            $_SESSION['vai_tro'] = $user['vai_tro'];
+            // 2. Kiểm tra mật khẩu (hỗ trợ cả mật khẩu mã hóa hash và mật khẩu thô)
+            $check_pass = false;
+            if (password_verify($password, $user['mat_khau'])) {
+                $check_pass = true; 
+            } elseif ($password === $user['mat_khau']) {
+                $check_pass = true; 
+            }
 
-            // Chuyển hướng về trang chủ
-            header("Location: index.php");
-            exit();
+            if ($check_pass) {
+                // ĐĂNG NHẬP THÀNH CÔNG
+                $_SESSION['ten_dang_nhap'] = $user['ten_dang_nhap'];
+                $_SESSION['vai_tro'] = $user['vai_tro'];
+                
+                // 3. GÁN MÃ NHÂN VIÊN VÀO SESSION (Dùng để lọc nhiệm vụ sửa chữa)
+                // Ưu tiên dùng cột ma_nv, nếu trống thì lấy tạm ten_dang_nhap
+                $_SESSION['ma_nv'] = !empty($user['ma_nv']) ? $user['ma_nv'] : $user['ten_dang_nhap'];
+
+                // Lưu thêm họ tên nếu có trong bảng tài khoản để hiển thị trên Header
+                if (isset($user['ho_ten'])) {
+                    $_SESSION['ho_ten'] = $user['ho_ten'];
+                }
+
+                header("Location: index.php");
+                exit();
+            } else {
+                $error = "Mật khẩu không chính xác!";
+            }
         } else {
-            $error = "Tên đăng nhập hoặc mật khẩu không đúng!";
+            $error = "Tên đăng nhập không tồn tại!";
         }
     }
 }
@@ -47,11 +67,11 @@ if (isset($_POST['login'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
-        body { background: #f4f7f6; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-card { width: 100%; max-width: 400px; padding: 20px; border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        body { background: #f4f7f6; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+        .login-card { width: 100%; max-width: 400px; padding: 20px; border: none; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: white; }
         .btn-primary { background-color: #2c3e50; border: none; }
         .btn-primary:hover { background-color: #1a252f; }
-    </small></style>
+    </style>
 </head>
 <body>
 
@@ -72,7 +92,7 @@ if (isset($_POST['login'])) {
                 <label class="form-label small fw-bold">Tên đăng nhập</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>
-                    <input type="text" name="username" class="form-control" placeholder="Nhập username..." required>
+                    <input type="text" name="username" class="form-control" placeholder="Mã nhân viên / Username" required>
                 </div>
             </div>
             
@@ -80,15 +100,12 @@ if (isset($_POST['login'])) {
                 <label class="form-label small fw-bold">Mật khẩu</label>
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-key"></i></span>
-                    <input type="password" name="password" class="form-control" placeholder="Nhập mật khẩu..." required>
+                    <input type="password" name="password" class="form-control" placeholder="Mật khẩu" required>
                 </div>
             </div>
 
             <button type="submit" name="login" class="btn btn-primary w-100 py-2 fw-bold">ĐĂNG NHẬP</button>
         </form>
-    </div>
-    <div class="card-footer bg-white border-0 text-center pb-3">
-        <small class="text-muted">Chưa có tài khoản? Liên hệ Ban quản lý.</small>
     </div>
 </div>
 
