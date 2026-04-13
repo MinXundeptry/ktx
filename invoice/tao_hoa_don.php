@@ -9,7 +9,6 @@ if (isset($_POST['btn_tao'])) {
     $ma_phong = mysqli_real_escape_string($conn, $_POST['ma_phong']);
     $thang = (int)$_POST['thang'];
     $nam = (int)$_POST['nam'];
-    $tien_phong = (int)$_POST['tien_phong'];
     $dien_cu = (int)$_POST['chi_so_dien_cu'];
     $dien_moi = (int)$_POST['chi_so_dien_moi'];
     $nuoc_cu = (int)$_POST['chi_so_nuoc_cu'];
@@ -17,8 +16,8 @@ if (isset($_POST['btn_tao'])) {
     $tong_tien = (float)$_POST['tong_tien_input'];
 
     // INSERT khớp chính xác với bảng hoa_don trong file SQL của bạn
-    $sql = "INSERT INTO hoa_don (ma_phong, thang, nam, tien_phong, chi_so_dien_cu, chi_so_dien_moi, chi_so_nuoc_cu, chi_so_nuoc_moi, tong_tien, trang_thai) 
-            VALUES ('$ma_phong', $thang, $nam, $tien_phong, $dien_cu, $dien_moi, $nuoc_cu, $nuoc_moi, $tong_tien, 'Chưa thanh toán')";
+    $sql = "INSERT INTO hoa_don (ma_phong, thang, nam, chi_so_dien_cu, chi_so_dien_moi, chi_so_nuoc_cu, chi_so_nuoc_moi, tong_tien, trang_thai) 
+            VALUES ('$ma_phong', $thang, $nam, $dien_cu, $dien_moi, $nuoc_cu, $nuoc_moi, $tong_tien, 'Chưa thanh toán')";
 
     if (mysqli_query($conn, $sql)) {
         $message = "<div class='alert alert-success shadow-sm border-0 rounded-4'>✅ Đã tạo hóa đơn thành công cho Phòng $ma_phong!</div>";

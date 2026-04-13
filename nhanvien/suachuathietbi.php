@@ -93,37 +93,47 @@ $result = mysqli_query($conn, $sql);
                 </div>
             </div>
 
-            <div class="modal fade" id="updateModal<?= $row['ma_yc'] ?>" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <form action="process_sua_chua_nv.php" method="POST" class="modal-content border-0 shadow">
-                        <div class="modal-header bg-light border-0">
-                            <h5 class="modal-title fw-bold">Cập nhật xử lý: Phòng <?= $row['ten_phong'] ?></h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <input type="hidden" name="ma_yc" value="<?= $row['ma_yc'] ?>">
-                            
-                            <div class="mb-3">
-                                <label class="form-label fw-bold small">TRẠNG THÁI HIỆN TẠI</label>
-                                <select name="trang_thai" class="form-select shadow-none">
-                                    <option value="Chờ xử lý" <?= $row['trang_thai'] == 'Chờ xử lý' ? 'selected' : '' ?>>Chờ xử lý</option>
-                                    <option value="Đang xử lý" <?= $row['trang_thai'] == 'Đang xử lý' ? 'selected' : '' ?>>Đang xử lý (Đang tiến hành)</option>
-                                    <option value="Đã hoàn thành" <?= $row['trang_thai'] == 'Đã hoàn thành' ? 'selected' : '' ?>>Đã hoàn thành (Xong)</option>
-                                </select>
-                            </div>
+           <div class="modal fade" id="updateModal<?= $row['ma_yc'] ?>" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="process_sua_chua_nv.php" method="POST" class="modal-content border-0 shadow">
+            <div class="modal-header bg-light border-0">
+                <h5 class="modal-title fw-bold">Cập nhật xử lý: Phòng <?= $row['ten_phong'] ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="ma_yc" value="<?= $row['ma_yc'] ?>">
+                
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">TÌNH TRẠNG THIẾT BỊ</label>
+                    <select name="tinh_trang" class="form-select shadow-none border-primary">
+                        <option value="Tốt" <?= $row['tinh_trang'] == 'Tốt' ? 'selected' : '' ?>>Tốt (Hoạt động bình thường)</option>
+                        <option value="Đang sửa" <?= $row['tinh_trang'] == 'Đang sửa' ? 'selected' : '' ?>>Đang sửa</option>
+                        <option value="Hỏng" <?= $row['tinh_trang'] == 'Hỏng' ? 'selected' : '' ?>>Hỏng (Cần thay thế/Chờ linh kiện)</option>
+                    </select>
+                    <div class="form-text small">Tình trạng thực tế của thiết bị tại phòng.</div>
+                </div>
 
-                            <div class="mb-0">
-                                <label class="form-label fw-bold small">PHẢN HỒI / GHI CHÚ</label>
-                                <textarea name="phan_hoi_nv" class="form-control shadow-none" rows="4" placeholder="Nhập vật tư đã thay, nguyên nhân hỏng..."><?= htmlspecialchars($row['phan_hoi_nv'] ?? '') ?></textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer border-0 bg-light">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
-                            <button type="submit" name="btn_nv_update" class="btn btn-primary px-4 fw-bold">LƯU KẾT QUẢ</button>
-                        </div>
-                    </form>
+                <div class="mb-3">
+                    <label class="form-label fw-bold small">TRẠNG THÁI XỬ LÝ ĐƠN</label>
+                    <select name="trang_thai" class="form-select shadow-none">
+                        <option value="Chờ xử lý" <?= $row['trang_thai'] == 'Chờ xử lý' ? 'selected' : '' ?>>Chờ xử lý</option>
+                        <option value="Đang xử lý" <?= $row['trang_thai'] == 'Đang xử lý' ? 'selected' : '' ?>>Đang xử lý</option>
+                        <option value="Đã hoàn thành" <?= $row['trang_thai'] == 'Đã hoàn thành' ? 'selected' : '' ?>>Đã hoàn thành</option>
+                    </select>
+                </div>
+
+                <div class="mb-0">
+                    <label class="form-label fw-bold small">PHẢN HỒI / GHI CHÚ</label>
+                    <textarea name="phan_hoi_nv" class="form-control shadow-none" rows="4" placeholder="Nhập vật tư đã thay..."><?= htmlspecialchars($row['phan_hoi_nv'] ?? '') ?></textarea>
                 </div>
             </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="submit" name="btn_nv_update" class="btn btn-primary px-4 fw-bold">LƯU KẾT QUẢ</button>
+            </div>
+        </form>
+    </div>
+</div>
             <?php endwhile; ?>
         </div>
     </div>

@@ -22,16 +22,36 @@ if (!$ma_phong) {
 if (isset($_POST['gui_yeu_cau'])) {
     $ma_tb = mysqli_real_escape_string($conn, $_POST['ma_tb']);
     $mo_ta = mysqli_real_escape_string($conn, $_POST['mo_ta_loi']);
-    $ngay_yeu_cau = date('Y-m-d H:i:s');
-
-    // Chèn vào bảng (Giả sử ông có bảng yeu_cau_sua_chua hoặc cập nhật trực tiếp bảng thiet_bi)
-    // Ở đây tôi chọn cách cập nhật trạng thái thiết bị để đồng bộ với phong_cua_toi.php
-    $sql_update = "UPDATE thiet_bi SET tinh_trang = 'Đang sửa' WHERE ma_tb = '$ma_tb' AND ma_phong = '$ma_phong'";
+    $ngay_gui = date('Y-m-d H:i:s');
     
-    if (mysqli_query($conn, $sql_update)) {
-        $message = "<div class='alert alert-success shadow-sm'><i class='bi bi-check-all'></i> Đã gửi yêu cầu thành công. Kỹ thuật viên sẽ sớm đến kiểm tra!</div>";
-    } else {
-        $message = "<div class='alert alert-danger'>Lỗi: " . mysqli_error($conn) . "</div>";
+    // Lấy thông tin từ mảng $sv đã truy vấn ở Bước 1
+    $ma_sv = $sv['ma_sv']; 
+    // $ma_phong đã có từ Bước 1
+
+    // Bắt đầu giao dịch để đảm bảo tính toàn vẹn dữ liệu
+    mysqli_begin_transaction($conn);
+
+    try {
+        // Lệnh 1: Cập nhật tình trạng trong bảng thiet_bi
+        $sql_update_tb = "UPDATE thiet_bi SET tinh_trang = 'Đang sửa' WHERE ma_tb = '$ma_tb'";
+        mysqli_query($conn, $sql_update_tb);
+
+        // Lệnh 2: Chèn vào bảng yêu cầu (Giả sử tên bảng là yeu_cau_sua_chua)
+        // Mình thêm cột ma_tb vào đây theo đúng cấu trúc bạn gửi
+        $sql_insert_yc = "INSERT INTO yeu_cau_sua_chua 
+            (ma_tb, ma_sv, tinh_trang, ma_phong, noi_dung_hong, ngay_gui, trang_thai, ten_dang_nhap) 
+            VALUES 
+            ('$ma_tb', '$ma_sv', 'Đang sửa', '$ma_phong', '$mo_ta', '$ngay_gui', 'Chưa xử lý', '$user_id')";
+        
+        if (mysqli_query($conn, $sql_insert_yc)) {
+            mysqli_commit($conn);
+            $message = "<div class='alert alert-success shadow-sm'><i class='bi bi-check-all'></i> Gửi báo cáo thành công! Ban quản lý đã nhận được thông tin.</div>";
+        } else {
+            throw new Exception(mysqli_error($conn));
+        }
+    } catch (Exception $e) {
+        mysqli_rollback($conn);
+        $message = "<div class='alert alert-danger'>Lỗi xử lý: " . $e->getMessage() . "</div>";
     }
 }
 
